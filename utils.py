@@ -37,14 +37,13 @@ def preprocess(lr, hr):
 def downsample(image, factor):
 	"""Using bicubic interpolation to get downsample image"""
 	bicbuic_img = cv2.resize(image,None,fx = 1.0/factor ,fy = 1.0/factor, interpolation = cv2.INTER_CUBIC)# Resize by scaling factor
-	bicbuic_img = cv2.resize(bicbuic_img,None,fx = factor ,fy=factor, interpolation = cv2.INTER_CUBIC)# Resize by scaling factor
 	# print(bicbuic_img.shape)
 
 	return bicbuic_img
 
     
 def downsample_batch(batch, factor):
-    downsampled = np.zeros((batch.shape[0], batch.shape[1] , batch.shape[2], 3))
+    downsampled = np.zeros((batch.shape[0], batch.shape[1] // factor, batch.shape[2] // factor, 3))
     for i in range(batch.shape[0]):
         downsampled[i, :, :, :] = downsample(batch[i, :, :, :], factor)
     return downsampled
