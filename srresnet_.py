@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+from utils import *
 
 class SRresnet:
 
@@ -90,6 +90,17 @@ class SRresnet:
 
 	def resnetLoss(self, y, y_pred):
 		return tf.reduce_mean(tf.square(y - y_pred))
+
+	def gradientLoss(self, y, y_pred):
+		# y = cany_oper_batch(y)
+		y = tf.image.sobel_edges(y)
+		y_pred = tf.image.sobel_edges(y_pred)
+
+		return tf.reduce_mean(tf.square(y - y_pred))
+
+	def totalLoss(self, resnetLoss, gradientLoss):
+		return resnetLoss + gradientLoss
+
 
 	def optimizer(self, loss):
 		# tf.control_dependencies([discrim_train

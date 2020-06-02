@@ -32,12 +32,11 @@ def main():
 	"""
 	Testing Variable 
 	"""
-
-	"""
-	Image and Edge map placeholder
-	"""
 	hr_ = tf.placeholder(tf.float32, [None, None, None, 3], name='HR_image')
 	lr_ = tf.placeholder(tf.float32, [None, None, None, 3], name='LR_image')
+	# hr_edge = tf.placeholder(tf.float32, [None, None, None, 1], name='HR_edge') 
+	# lr_edge = tf.placeholder(tf.float32, [None, None, None, 1], name='LR_edge') 
+
 	training_net = tf.placeholder(tf.bool, name='training_net')
 
 	""" DEBUG placeholder parmaters """
@@ -46,7 +45,11 @@ def main():
 	y_pred = sr_resnet.foward(lr_)
 
 	resnet_loss = sr_resnet.resnetLoss(hr_, y_pred)
+	gradient_loss = sr_resnet.gradientLoss(hr_, y_pred)
 
+	total_loss = sr_resnet.totalLoss(resnet_loss, gradient_loss)
+
+	
 	resnet_opt = sr_resnet.optimizer(resnet_loss)
 
 	benchmarks = [
