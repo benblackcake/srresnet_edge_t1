@@ -20,7 +20,7 @@ class Benchmark:
         self.image_lr_edge = []
 
         for img in self.images_hr:
-            self.images_lr.append(downsample(img, 3))
+            self.images_lr.append(downsample(img, 4))
 
         for img in self.images_lr:
             self.image_lr_edge.append(cany_oper(img))
@@ -37,7 +37,7 @@ class Benchmark:
         """Given a list of file names, return a list of images"""
         out = []
         for image in images:
-            out.append(modcrop(misc.imread(image, mode='RGB').astype(np.uint8),3))
+            out.append(misc.imread(image, mode='RGB').astype(np.uint8))
         return out
 
     def deprocess(self, image):
