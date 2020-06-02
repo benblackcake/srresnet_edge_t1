@@ -27,11 +27,11 @@ class SRresnet:
 
 	    skip = x
 	    x = tf.nn.conv2d(x, weights['w1'], strides=[1,1,1,1], padding='SAME')
-	    x = tf.layers.batch_normalization(x)
+	    x = tf.layers.batch_normalization(x, training=self.training)
 	    x = tf.nn.relu(x)
 	    x = tf.nn.conv2d(x, weights['w2'], strides=[1,1,1,1], padding='SAME')
 	    x = tf.nn.relu(x)
-	    x = tf.layers.batch_normalization(x)
+	    x = tf.layers.batch_normalization(x, training=self.training)
 
 	    x = x + skip
 	    return x
@@ -74,7 +74,7 @@ class SRresnet:
 				x = self.ResidualBlock(x, 3, 64)
 
 			x = tf.nn.conv2d(x, weights['w1'], strides=[1,1,1,1], padding='SAME', name='w_in_residual_out')
-			x = tf.layers.batch_normalization(x, training=True)
+			x = tf.layers.batch_normalization(x, training=self.training)
 			x = x + skip
 
 			for i in range(2):
