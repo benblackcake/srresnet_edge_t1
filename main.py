@@ -49,7 +49,7 @@ def main():
 
 	total_loss = sr_resnet.totalLoss(resnet_loss, gradient_loss)
 
-	
+
 	resnet_opt = sr_resnet.optimizer(resnet_loss)
 
 	benchmarks = [
@@ -103,6 +103,7 @@ def main():
 					batch_lr = downsample_batch(batch_hr, factor=4)
 					batch_lr, batch_hr = preprocess(batch_lr, batch_hr)
 					_, err = sess.run([resnet_opt,resnet_loss], feed_dict={training_net: True, lr_: batch_lr, hr_: batch_hr})
+					
 					t.set_description("[Eopch: %s][Iter: %s][Error: %.4f]" %(epoch, iterator, err))
 
 					iterator += 1
