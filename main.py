@@ -1,0 +1,105 @@
+
+
+from srresnet_ import SRresnet
+import tensorflow as tf
+import argparse
+from utils import *
+import numpy as np
+import os
+import sys
+import cv2
+from tqdm import tqdm,trange
+from benchmark import Benchmark
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--load', type=str, help='Checkpoint to load all weights from.')
+	parser.add_argument('--batch-size', type=int, default=128, help='Mini-batch size.')
+	parser.add_argument('--learning-rate', type=float, default=1e-4, help='Learning rate for Adam.')
+	parser.add_argument('--train-dir', type=str, help='Directory containing training images')
+	parser.add_argument('--image-size', type=int, default=96, help='Size of random crops used for training samples.')
+	parser.add_argument('--epoch', type=int, default='100', help='How many iterations ')
+	parser.add_argument('--log-freq', type=int, default=1000, help='How many training iterations between validation/checkpoints.')
+	parser.add_argument('--block-n', type=int, default=3, help='How many recurenet blocks')
+	parser.add_argument('--is-val', action='store_true', help='True for evaluate image')
+	parser.add_argument('--gpu', type=str, default='0', help='Which GPU to use')
+
+	args = parser.parse_args()
+	os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
+
+	args = parser.parse_args()
+
+	"""
+	Testing Variable 
+	"""
+
+	"""
+	Image and Edge map placeholder
+	"""
+	hr_ = tf.placeholder(tf.float32, [None, None, None, 3], name='HR_image')
+	lr_ = tf.placeholder(tf.float32, [None, None, None, 3], name='LR_image')
+	training_net = tf.placeholder(tf.bool, name='training_net')
+
+	""" DEBUG placeholder parmaters """
+
+	sr_resnet = SRresnet(training=training_net, learning_rate = args.learning_rate)
+	y_pred = sr_resnet.foward(lr_)
+
+	resnet_loss = sr_resnet.resnetLoss(hr_, y_pred)
+
+	resnet_opt = sr_resnet.optimizer(resnet_loss)
+
+	benchmarks = [
+		Benchmark('Benchmarks/Set5', name='Set5'),
+		Benchmark('Benchmarks/Set14', name='Set14'),
+		Benchmark('Benchmarks/BSD100', name='BSD100')
+	]
+
+    #Set up h5 dataset path
+	train_data_path = 'done_dataset\PreprocessedData.h5'
+	val_data_path = 'done_dataset\PreprocessedData_val.h5'
+	eval_data_path = 'done_dataset\PreprocessedData_eval.h5'
+
+	"""Train session"""
+	with tf.Session() as sess:
+		sess.run(tf.local_variables_initializer())
+		sess.run(tf.global_variables_initializer())
+		# print(get_batch_folder_list(t_path))
+		# print(iter(get_batch_folder_list(t_path)))
+		iterator = 0
+		saver = tf.train.Saver(tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES,scope='sr_edge_net'), max_to_keep=10)
+
+		if args.load:
+			# iterator = int(args.load.split('-')[-1])
+			# saver.restore(sess, args.load)
+			iterator ,sess = load(sess,saver, args.load)
+			iterator = int(iterator.split('-')[1])
+
+		train_data_set = get_data_set(train_data_path,'train')
+		val_data_set = get_data_set(val_data_path,'val')
+		eval_data_set = get_data_set(eval_data_path,'eval')
+
+
+		if args.is_val:
+			""" To validate Benchmarks"""
+
+			for benchmark in benchmarks:
+				psnr, ssim, _, _ = benchmark.eval(sess, y_pred, log_path='results', iteration=iterator)
+				print(' [%s] PSNR: %.2f, SSIM: %.4f' % (benchmark.name, psnr, ssim), end='')
+
+		else:
+			""" To Training """
+
+			for epoch in range(args.epoch):
+				t =trange(0, len(train_data_set) - args.batch_size + 1, args.batch_size, desc='Iterations')
+				for batch_idx in t:
+					batch_hr = train_data_set[batch_idx:batch_idx + 16]
+					batch_lr = downsample_batch(batch_hr, factor=4)
+					batch_lr, batch_hr = preprocess(batch_lr, batch_hr)
+					_, err = sess.run([resnet_opt,resnet_loss], feed_dict={training_net: True, lr_: batch_lr, hr_: batch_hr})
+
+				# print(err)
+
+if __name__=='__main__':
+
+	main()
