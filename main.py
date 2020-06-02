@@ -91,13 +91,20 @@ def main():
 			""" To Training """
 
 			for epoch in range(args.epoch):
-				t =trange(0, len(train_data_set) - args.batch_size + 1, args.batch_size, desc='Iterations')
+				t =trange(0, len(train_data_set) - args.batch_size + 1, args.batch_size,\
+					bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}',\
+					desc='Iterations')
+
 				for batch_idx in t:
 					batch_hr = train_data_set[batch_idx:batch_idx + 16]
 					batch_lr = downsample_batch(batch_hr, factor=4)
 					batch_lr, batch_hr = preprocess(batch_lr, batch_hr)
 					_, err = sess.run([resnet_opt,resnet_loss], feed_dict={training_net: True, lr_: batch_lr, hr_: batch_hr})
+					t.set_description("[Eopch: %s][Iter: %s][Error: %.4f]" %(epoch, iterator, err))
 
+					iterator += 1
+					if iterator%args.log_freq == 0:
+						save(sess,saver,'checkpoint',iterator)
 				# print(err)
 
 if __name__=='__main__':

@@ -105,7 +105,7 @@ def load(sess,saver,checkpoint_dir):
 		return ckpt_path,sess
 	else:
 		print("\n! Checkpoint Loading Failed \n\n")
-
+		raise
 def save(sess,saver,checkpoint_dir, step):
 	"""
 	To save the checkpoint use to test or pretrain
