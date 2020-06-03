@@ -14,7 +14,7 @@ from benchmark import Benchmark
 def main():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--load', type=str, help='Checkpoint to load all weights from.')
-	parser.add_argument('--log-path', type=str, default='results/' help='Checkpoint to load all weights from.')
+	parser.add_argument('--log-path', type=str, default='results/', help='Checkpoint to load all weights from.')
 	parser.add_argument('--batch-size', type=int, default=128, help='Mini-batch size.')
 	parser.add_argument('--learning-rate', type=float, default=1e-4, help='Learning rate for Adam.')
 	parser.add_argument('--train-dir', type=str, help='Directory containing training images')
