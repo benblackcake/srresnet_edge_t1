@@ -122,9 +122,9 @@ class Benchmark:
     def evaluate(self, sess, g_y_pred, log_path=None, iteration=0):
         """Evaluate benchmark, returning the score and saving images."""
         pred = []
-        for i, lr in enumerate(self.images_lr):
+        for i, x in enumerate(self.images_lr):
             # feed images 1 by 1 because they have different sizes
-            lr = lr / 255.0
+            x = x / 255.0
             output = sess.run(g_y_pred, feed_dict={'LR_image:0': x[np.newaxis],'training_net:0':False})
             # deprocess output
             pred.append(self.deprocess(np.squeeze(output, axis=0)))
