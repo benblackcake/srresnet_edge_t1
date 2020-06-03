@@ -15,10 +15,10 @@ class SRresnet:
 	    """Residual block a la ResNet"""
 	    with tf.variable_scope('sr_edge_net') as scope:
 		    weights = {
-				'w1':tf.get_variable(name='w1', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+				'w1_residual':tf.get_variable(name='w1', shape=[kernel_size, kernel_size, filter_size, filter_size],\
 									 dtype=tf.float32,\
 									 initializer=tf.glorot_normal_initializer()),
-				'w2':tf.get_variable(name='w2', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+				'w2_residual':tf.get_variable(name='w2', shape=[kernel_size, kernel_size, filter_size, filter_size],\
 						 dtype=tf.float32,\
 						 initializer=tf.glorot_normal_initializer()),
 			}
