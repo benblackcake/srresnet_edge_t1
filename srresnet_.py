@@ -13,25 +13,25 @@ class SRresnet:
 
 	def ResidualBlock(self, x, kernel_size, filter_size):
 	    """Residual block a la ResNet"""
-	    with tf.variable_scope('sr_edge_net') as scope:
-		    weights = {
-				'w1_residual':tf.get_variable(name='w1_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
-									 dtype=tf.float32,\
-									 initializer=tf.glorot_normal_initializer()),
-				'w2_residual':tf.get_variable(name='w2_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
-						 dtype=tf.float32,\
-						 initializer=tf.glorot_normal_initializer()),
-			}
 
-		    skip = x
-		    x = tf.nn.conv2d(x, weights['w1_residual'], strides=[1,1,1,1], padding='SAME')
-		    x = tf.layers.batch_normalization(x, training=self.training)
-		    x = tf.nn.relu(x)
-		    x = tf.nn.conv2d(x, weights['w2_residual'], strides=[1,1,1,1], padding='SAME')
-		    x = tf.nn.relu(x)
-		    x = tf.layers.batch_normalization(x, training=self.training)
+	    weights = {
+			'w1_residual':tf.Variable(name='w1_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+								 dtype=tf.float32,\
+								 initializer=tf.glorot_normal_initializer()),
+			'w2_residual':tf.Variable(name='w2_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+					 dtype=tf.float32,\
+					 initializer=tf.glorot_normal_initializer()),
+		}
 
-		    x = x + skip
+	    skip = x
+	    x = tf.nn.conv2d(x, weights['w1_residual'], strides=[1,1,1,1], padding='SAME')
+	    x = tf.layers.batch_normalization(x, training=self.training)
+	    x = tf.nn.relu(x)
+	    x = tf.nn.conv2d(x, weights['w2_residual'], strides=[1,1,1,1], padding='SAME')
+	    x = tf.nn.relu(x)
+	    x = tf.layers.batch_normalization(x, training=self.training)
+
+	    x = x + skip
 		    return x
 
 	def Upsample2xBlock(self, x, kernel_size, filter_size):
@@ -53,11 +53,11 @@ class SRresnet:
 		with tf.variable_scope('sr_edge_net') as scope:
 
 			weights ={
-				'w_in':tf.get_variable(name='w_in', shape=[9, 9, 3, 64], dtype=tf.float32,\
+				'w_in':tf.Variable(name='w_in', shape=[9, 9, 3, 64], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
-				'w1':tf.get_variable(name='w1', shape=[3, 3, 64, 64], dtype=tf.float32,\
+				'w1':tf.Variable(name='w1', shape=[3, 3, 64, 64], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
-				'w_out':tf.get_variable(name='w_out', shape=[9, 9, 64, 3], dtype=tf.float32,\
+				'w_out':tf.Variable(name='w_out', shape=[9, 9, 64, 3], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
 			}
 
