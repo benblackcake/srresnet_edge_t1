@@ -15,15 +15,13 @@ class SRresnet:
 	    """Residual block a la ResNet"""
 
 	    weights = {
-			'w1': tf.Variable(tf.random_normal([kernel_size, kernel_size, filter_size, filter_size], stddev=1e-3), name='w1'),
-			'w2': tf.Variable(tf.random_normal([kernel_size, kernel_size, filter_size, filter_size], stddev=1e-3), name='w2'),
-	            # 'w3': tf.Variable(tf.random_normal([3, 3, 32, self.c_dim], stddev=1e-3), name='w3')
-	    }
-
-	    biases = {
-	    	'b1':tf.Variable(tf.zeros([64],name='b1')),
-	    	'b2':tf.Variable(tf.zeros([64],name='b2')),
-	    }
+			'w1':tf.get_variable(name='w1', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+								 dtype=tf.float32,\
+								 initializer=tf.glorot_normal_initializer()),
+			'w2':tf.get_variable(name='w2', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+					 dtype=tf.float32,\
+					 initializer=tf.glorot_normal_initializer()),
+		}
 
 	    skip = x
 	    x = tf.nn.conv2d(x, weights['w1'], strides=[1,1,1,1], padding='SAME')
@@ -55,15 +53,14 @@ class SRresnet:
 		with tf.variable_scope('sr_edge_net') as scope:
 
 			weights ={
-				'w_in': tf.Variable(tf.random_normal([9, 9, 3, 64], stddev=1e-3), name='w_in'),
-		    	'w1': tf.Variable(tf.random_normal([3, 3, 64, 64], stddev=1e-3), name='w1'),
-		    	'w_out': tf.Variable(tf.random_normal([9, 9, 64, 3], stddev=1e-3), name='w_in')
+				'w_in':tf.get_variable(name='w_in', shape=[9, 9, 3, 64], dtype=tf.float32,\
+					initializer=tf.glorot_normal_initializer()),
+				'w1':tf.get_variable(name='w1', shape=[3, 3, 64, 64], dtype=tf.float32,\
+					initializer=tf.glorot_normal_initializer()),
+				'w_out':tf.get_variable(name='w_out', shape=[9, 9, 64, 3], dtype=tf.float32,\
+					initializer=tf.glorot_normal_initializer()),
 			}
 
-			biases = {
-				'b_in': tf.Variable(tf.zeros([64],name='b_in')),
-				'b1': tf.Variable(tf.zeros([64],name='b1')),
-			}
 
 			# print(x_concate)
 			x = tf.nn.conv2d(x, weights['w_in'], strides=[1,1,1,1], padding='SAME', name='x_input')
