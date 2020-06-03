@@ -124,7 +124,7 @@ def main():
 							psnr,ssim,_,_ = benchmark.evaluate(sess, y_pred, args.log_path, iterator)
 							print(' [%s] PSNR: %.2f, SSIM: %.4f' % (benchmark.name, psnr, ssim), end='')
 							log_line += ',%.7f, %.7f' % (psnr, ssim)
-						record_log(iterator, val_error, eval_error, args.log_path, iterator)
+						record_log(iterator, val_error, eval_error, args.log_path, log_line)
 						save(sess,saver,'checkpoint',iterator)
 					""""""
 
