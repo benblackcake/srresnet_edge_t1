@@ -15,19 +15,19 @@ class SRresnet:
 	    """Residual block a la ResNet"""
 	    with tf.variable_scope('sr_edge_net') as scope:
 		    weights = {
-				'w1_residual':tf.get_variable(name='w1', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+				'w1_residual':tf.get_variable(name='w1_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
 									 dtype=tf.float32,\
 									 initializer=tf.glorot_normal_initializer()),
-				'w2_residual':tf.get_variable(name='w2', shape=[kernel_size, kernel_size, filter_size, filter_size],\
+				'w2_residual':tf.get_variable(name='w2_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
 						 dtype=tf.float32,\
 						 initializer=tf.glorot_normal_initializer()),
 			}
 
 		    skip = x
-		    x = tf.nn.conv2d(x, weights['w1'], strides=[1,1,1,1], padding='SAME')
+		    x = tf.nn.conv2d(x, weights['w1_residual'], strides=[1,1,1,1], padding='SAME')
 		    x = tf.layers.batch_normalization(x, training=self.training)
 		    x = tf.nn.relu(x)
-		    x = tf.nn.conv2d(x, weights['w2'], strides=[1,1,1,1], padding='SAME')
+		    x = tf.nn.conv2d(x, weights['w2_residual'], strides=[1,1,1,1], padding='SAME')
 		    x = tf.nn.relu(x)
 		    x = tf.layers.batch_normalization(x, training=self.training)
 
