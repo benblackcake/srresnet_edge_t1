@@ -5,7 +5,7 @@ import glob
 import os
 import tensorflow as tf
 import h5py
-
+import math
 
 def cany_oper(image):
 	"""Using cany operator to get image edge map"""
