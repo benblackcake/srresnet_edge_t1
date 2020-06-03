@@ -49,7 +49,6 @@ def main():
 
 	total_loss = sr_resnet.totalLoss(resnet_loss, gradient_loss)
 
-
 	resnet_opt = sr_resnet.optimizer(total_loss)
 
 	benchmarks = [
@@ -82,6 +81,8 @@ def main():
 		val_data_set = get_data_set(val_data_path,'val')
 		eval_data_set = get_data_set(eval_data_path,'eval')
 
+		val_error_li =[]
+		eval_error_li =[]
 
 		if args.is_val:
 			""" To validate Benchmarks"""
@@ -106,9 +107,29 @@ def main():
 					
 					t.set_description("[Eopch: %s][Iter: %s][Error: %.4f]" %(epoch, iterator, err))
 
-					iterator += 1
+
+					""" Log Eval and Val status"""
 					if iterator%args.log_freq == 0:
+						for batch_idx in range(0, len(val_data_set) - args.batch_size + 1, args.batch_size): 
+						# Test every log-freq iterations
+							val_error = evaluate_model(total_loss, val_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
+							eval_error = evaluate_model(total_loss, eval_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
+						
+						val_error_li.append(val_error)
+						eval_error_li.append(eval_error)
+
+						log_line = ''
+						for benchmark in benchmarks:
+							psnr,ssim,_,_ = benchmark.evaluate(sess,y_pred,log_path='results',iterator)
+							print(' [%s] PSNR: %.2f, SSIM: %.4f' % (benchmark.name, psnr, ssim), end='')
+							log_line += ',%.7f, %.7f' % (psnr, ssim)
+						record_log(iterator, val_error, eval_error, log_path='results', iterator)
 						save(sess,saver,'checkpoint',iterator)
+					""""""
+
+					""" Iterator """	
+					iterator += 1
+
 				# print(err)
 
 if __name__=='__main__':

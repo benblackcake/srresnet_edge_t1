@@ -125,8 +125,7 @@ class Benchmark:
         for i, lr in enumerate(self.images_lr):
             # feed images 1 by 1 because they have different sizes
             lr = lr / 255.0
-            output = sess.run(g_y_pred, feed_dict={'d_training:0': False, 'g_training:0': False,
-                                                   'input_lowres:0': lr[np.newaxis]})
+            output = sess.run(g_y_pred, feed_dict={'LR_image:0': x[np.newaxis],'training_net:0':False})
             # deprocess output
             pred.append(self.deprocess(np.squeeze(output, axis=0)))
         # save images

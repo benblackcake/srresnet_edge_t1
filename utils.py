@@ -118,3 +118,23 @@ def save(sess,saver,checkpoint_dir, step):
 		os.makedirs(checkpoint_dir)
 
 	saver.save(sess, os.path.join(checkpoint_dir, model_name), global_step=step, write_meta_graph=False)
+
+
+def record_log(iteration, val_error, eval_error, log_path, log_line):
+	with open(log_path+'/recorded.csv', 'a') as f:
+		f.write('%d, %.15f, %.15f %s\n' % (iteration,val_error,eval_error,log_line))
+
+
+def evaluate_model(loss_function, get_batch, sess, num_images, batch_size):
+	"""Tests the model over all num_images using input tensor get_batch"""
+	loss = 0
+	total = 0
+	for i in range(int(math.ceil(num_images / batch_size))):
+		batch_hr = get_batch
+		batch_lr = downsample_batch(batch_hr, factor=4)
+		batch_lr, batch_hr = preprocess(batch_lr, batch_hr)
+	loss += sess.run(loss_function,\
+		feed_dict={'training_net:0': False,'LR_image:0': batch_lr, 'HR_image:0': batch_hr})
+	total += 1
+	loss = loss / total
+	return loss
