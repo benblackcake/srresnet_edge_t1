@@ -12,31 +12,33 @@ class SRresnet:
 
 
 	def ResidualBlock(self, x, kernel_size, filter_size):
-	    """Residual block a la ResNet"""
-
-	    weights = {
-			'w1_residual':tf.Variable(name='w1_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
-								 dtype=tf.float32,\
-								 initializer=tf.glorot_normal_initializer()),
-			'w2_residual':tf.Variable(name='w2_residual', shape=[kernel_size, kernel_size, filter_size, filter_size],\
-					 dtype=tf.float32,\
-					 initializer=tf.glorot_normal_initializer()),
+		"""Residual block a la ResNet"""
+		# with tf.variable_scope('sr_edge_net') as scope:		
+		weights = {
+			'w1':tf.get_variable(name='w1_redidual',\
+				shape=[kernel_size, kernel_size, filter_size, filter_size], dtype=tf.float32,\
+				initializer=tf.glorot_normal_initializer()),
+			'w2':tf.get_variable(name='w2_residual',\
+				shape=[kernel_size, kernel_size, filter_size, filter_size], dtype=tf.float32,\
+				initializer=tf.glorot_normal_initializer()),
 		}
 
-	    skip = x
-	    x = tf.nn.conv2d(x, weights['w1_residual'], strides=[1,1,1,1], padding='SAME')
-	    x = tf.layers.batch_normalization(x, training=self.training)
-	    x = tf.nn.relu(x)
-	    x = tf.nn.conv2d(x, weights['w2_residual'], strides=[1,1,1,1], padding='SAME')
-	    x = tf.nn.relu(x)
-	    x = tf.layers.batch_normalization(x, training=self.training)
+		skip = x
+		x = tf.nn.conv2d(x, weights['w1'], strides=[1,1,1,1], padding='SAME')
+		x = tf.layers.batch_normalization(x, training=self.training)
+		x = tf.nn.relu(x)
+		x = tf.nn.conv2d(x, weights['w2'], strides=[1,1,1,1], padding='SAME')
+		x = tf.nn.relu(x)
+		x = tf.layers.batch_normalization(x, training=self.training)
 
-	    x = x + skip
+		x = x + skip
 		return x
 
 	def Upsample2xBlock(self, x, kernel_size, filter_size):
 		weights = {
-		    'w1': tf.Variable(tf.random_normal([kernel_size, kernel_size, 64, filter_size], stddev=1e-3), name='w1'),
+			'w1':tf.get_variable(name='w1_upsample',\
+				shape=[kernel_size, kernel_size, 64, filter_size], dtype=tf.float32,\
+				initializer=tf.glorot_normal_initializer()),
 		}
 		"""Upsample 2x via SubpixelConv"""
 		print('init',x)
@@ -50,17 +52,16 @@ class SRresnet:
 
 
 	def foward(self, x):
-		with tf.variable_scope('sr_edge_net') as scope:
+		with tf.variable_scope('sr_edge_net',reuse=tf.AUTO_REUSE) as scope:
 
 			weights ={
-				'w_in':tf.Variable(name='w_in', shape=[9, 9, 3, 64], dtype=tf.float32,\
+				'w_in':tf.get_variable(name='w_in', shape=[9, 9, 3, 64], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
-				'w1':tf.Variable(name='w1', shape=[3, 3, 64, 64], dtype=tf.float32,\
+				'w1':tf.get_variable(name='w1', shape=[3, 3, 64, 64], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
-				'w_out':tf.Variable(name='w_out', shape=[9, 9, 64, 3], dtype=tf.float32,\
+				'w_out':tf.get_variable(name='w_out', shape=[9, 9, 64, 3], dtype=tf.float32,\
 					initializer=tf.glorot_normal_initializer()),
 			}
-
 
 			# print(x_concate)
 			x = tf.nn.conv2d(x, weights['w_in'], strides=[1,1,1,1], padding='SAME', name='x_input')
