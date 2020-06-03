@@ -113,8 +113,8 @@ def main():
 					if iterator%args.log_freq == 0:
 						for batch_idx in range(0, len(val_data_set) - args.batch_size + 1, args.batch_size): 
 						# Test every log-freq iterations
-							val_error = evaluate_model(total_loss, val_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
-							eval_error = evaluate_model(total_loss, eval_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
+							val_error = evaluate_model(resnet_loss, val_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
+							eval_error = evaluate_model(resnet_loss, eval_data_set[batch_idx:batch_idx + 16], sess, 119, args.batch_size)
 						
 						val_error_li.append(val_error)
 						eval_error_li.append(eval_error)
