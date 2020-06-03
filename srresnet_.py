@@ -32,7 +32,7 @@ class SRresnet:
 	    x = tf.layers.batch_normalization(x, training=self.training)
 
 	    x = x + skip
-		    return x
+		return x
 
 	def Upsample2xBlock(self, x, kernel_size, filter_size):
 		weights = {
