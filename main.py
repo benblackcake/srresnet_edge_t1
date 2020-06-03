@@ -43,7 +43,7 @@ def main():
 	""" DEBUG placeholder parmaters """
 
 	sr_resnet = SRresnet(training=training_net, learning_rate = args.learning_rate)
-	y_pred = sr_resnet.foward(lr_)
+	y_pred = sr_resnet.forward(lr_)
 
 	resnet_loss = sr_resnet.resnetLoss(hr_, y_pred)
 	gradient_loss = sr_resnet.gradientLoss(hr_, y_pred)
