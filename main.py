@@ -50,7 +50,7 @@ def main():
 
 	total_loss = sr_resnet.totalLoss(resnet_loss, gradient_loss)
 
-	resnet_opt = sr_resnet.optimizer(total_loss)
+	resnet_opt = sr_resnet.optimizer(resnet_loss)
 
 	benchmarks = [
 		Benchmark('Benchmarks/Set5', name='Set5'),
